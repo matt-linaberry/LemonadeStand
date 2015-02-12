@@ -30,10 +30,20 @@ class ViewController: UIViewController {
     let costOfLemon = 2
     let costOfIceCube = 1
     
+    var weatherArray:[[Int]] = [[-10, -9, -5, -7], [5, 8, 10, 9], [22, 25, 27, 23]]
+    
+    var weatherToday:[Int] = [0,0,0,0]
+    
+    var weatherImageView: UIImageView = UIImageView(frame: CGRect(x: 20, y: 50, width: 50, height: 50))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        self.view.addSubview(weatherImageView)
         refreshView()
+        simulateWeatherToday()
+        
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -124,13 +134,15 @@ class ViewController: UIViewController {
         refreshView()
     }
     @IBAction func startDayButtonPressed(sender: AnyObject) {
+        let average = findAverage(weatherToday)
+        
         if iceCubesMixed == 0  {
             showAlertWithText(header: "Attention!", message: "You must mix at least one ice cube!")
             return
         }
         calculateLemonadeRatio()
         // create a random number of customers for the day
-        var randomNumber = Int(arc4random_uniform(UInt32(10)))
+        var randomNumber = Int(arc4random_uniform(UInt32(abs(average))))
         var customersArray:[Customer] = []
 //        Then, create a random taste preference(between 0 and 1) for each customer (hint, this should be a constant and you may want to use a type of loop to generate each preference).
 //        For example, you might generate 5 customers for the day with preferences as such: 0.5, 0.7, 0.3, 0.4, 0.1
@@ -212,6 +224,7 @@ class ViewController: UIViewController {
         lemonsMixed = 0
         iceCubesPurchased = 0
         iceCubesMixed = 0
+        simulateWeatherToday()
         refreshView()
         if theSalesman.cashOnHand == 0 && theSalesman.iceCubesOnHand == 0 {
             var gameOverAlert = UIAlertController(title: "Busto!", message: "Your bankroll is empty and you have no ice cubes to make lemonade. Your game is over!", preferredStyle: UIAlertControllerStyle.Alert)
@@ -248,6 +261,36 @@ class ViewController: UIViewController {
         var alert = UIAlertController(title: header, message: message, preferredStyle: UIAlertControllerStyle.Alert)
         alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.Default, handler: nil))
         self.presentViewController(alert, animated: true, completion: nil)
+    }
+    
+    func simulateWeatherToday() {
+        
+        let index = Int(arc4random_uniform(UInt32(weatherArray.count)))
+        
+        weatherToday = weatherArray[index]
+        switch index {
+        case 0:
+            weatherImageView.image = UIImage(named: "Cold")
+        case 1:
+            weatherImageView.image = UIImage(named: "Mild")
+        case 2:
+            weatherImageView.image = UIImage(named: "Warm")
+        default:
+            weatherImageView.image = UIImage(named: "Warm")
+        }
+    }
+    
+    func findAverage(data:[Int]) -> Int {
+        var sum = 0
+        for x in data {
+            sum += x
+        }
+        
+        var average:Double = Double(sum) / Double(data.count)
+        
+        var rounded:Int = Int(ceil(average)) // round it up
+        
+        return rounded
     }
 }
 
