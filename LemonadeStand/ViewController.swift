@@ -130,9 +130,29 @@ class ViewController: UIViewController {
         }
         calculateLemonadeRatio()
         // create a random number of customers for the day
-        
+        var randomNumber = Int(arc4random_uniform(UInt32(10)))
+        var customersArray:[Customer] = []
 //        Then, create a random taste preference(between 0 and 1) for each customer (hint, this should be a constant and you may want to use a type of loop to generate each preference).
 //        For example, you might generate 5 customers for the day with preferences as such: 0.5, 0.7, 0.3, 0.4, 0.1
+        for var customerCounter = 1; customerCounter <= randomNumber; customerCounter++ {
+            var aCustomer = Customer()
+            var randomTastePreference:Double = Double(arc4random_uniform(UInt32(10))) / 10
+            aCustomer.tastePreference = randomTastePreference
+            customersArray.append(aCustomer)
+            println("Added customer number \(customersArray.count) with taste preference \(aCustomer.tastePreference)")
+            
+        }
+        
+        println("Your lemonade ratio is \(theLemonadeRatio)")
+        if (theLemonadeRatio > 1) {
+            println("You have acidic lemonade.")
+        }
+        else if (theLemonadeRatio == 1) {
+            println("You have equal parts lemonade.")
+        }
+        else {
+            println("You have diluted lemonade.")
+        }
 //        Then, you should compare your preferences to a range of values, as well as the current lemonade ratio to a separate range of values. Then see if they match. We are not comparing the ratios directly to each other! Ranges are shown in the steps below. So, what do we mean!? Here's a breakdown:
 //        You should compare your randomly-generated customer's preferences to 3 different ranges from 0 to 1.
 //        The three ranges are:
@@ -148,14 +168,63 @@ class ViewController: UIViewController {
 //        This should read, If the customer likes acidic lemonade (between 0 – 0.4) and the lemonade is acidic (greater than 1) Get paid a dollar!
 //        Follow this example for the next 2 comparison sets...
 //        At the end, you'll want an else statement where they didn't want to buy your lemonade, so you will not be paid.
+        
 //        **You'll want to run through this logic for each customer you randomly generate.**
 //        While you are comparing the preferences to these ranges, we want to see which customers are buying and which are not. So, write a println that will show
 //        each customer’s generated preference value, and
 //        whether or not they matched to the lemonade.
 //        If they matched, print “Paid!”
 //        If not, print “No match, No Revenue.”
-        
-        
+        for aCustomer in customersArray {
+            if (aCustomer.tastePreference <= 0.4) {
+                println("This customer prefers acidic lemonade.")
+                if (theLemonadeRatio > 1.0) {
+                    // we get paid!
+                    println("You got paid $1!")
+                    theSalesman.cashOnHand++
+                }
+                else {
+                    println("Sorry, no sale.")
+                }
+            }
+            else if aCustomer.tastePreference > 0.4 && aCustomer.tastePreference <= 0.6 {
+                println("This customer prefers equal parts lemonade.")
+                if theLemonadeRatio == 1.0 {
+                    println("You got paid $1!")
+                    theSalesman.cashOnHand++
+                }
+                else {
+                    println("Sorry, no sale.")
+                }
+            }
+            else if aCustomer.tastePreference > 0.6 {
+                println("This customer prefers diluted lemonade.")
+                if theLemonadeRatio < 1 {
+                    println("You got paid $1!")
+                    theSalesman.cashOnHand++
+                }
+                else {
+                    println("Sorry, no sale.")
+                }
+            }
+        }
+        lemonsPurchased = 0
+        lemonsMixed = 0
+        iceCubesPurchased = 0
+        iceCubesMixed = 0
+        refreshView()
+        if theSalesman.cashOnHand == 0 && theSalesman.iceCubesOnHand == 0 {
+            var gameOverAlert = UIAlertController(title: "Busto!", message: "Your bankroll is empty and you have no ice cubes to make lemonade. Your game is over!", preferredStyle: UIAlertControllerStyle.Alert)
+            let startOverAction:UIAlertAction = UIAlertAction(title: "Start Over", style: UIAlertActionStyle.Default) { action -> Void in
+                self.theSalesman.cashOnHand = 10
+                self.theSalesman.iceCubesOnHand = 1
+                self.theSalesman.lemonsOnHand = 1
+                self.refreshView()
+            }
+            
+            gameOverAlert.addAction(startOverAction)
+            self.presentViewController(gameOverAlert, animated: true, completion: nil)
+        }
         
     }
     
